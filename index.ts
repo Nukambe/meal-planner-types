@@ -78,7 +78,7 @@ export class Meal {
   ) {}
 }
 
-class Day {
+export class Day {
   meals?: Meal[];
   limits?: Nutrition;
 
@@ -88,7 +88,7 @@ class Day {
   }
 }
 
-class Week {
+export class Week {
   sunday: Day;
   monday: Day;
   tuesday: Day;
@@ -110,7 +110,7 @@ class Week {
   }
 }
 
-class Year {
+export class Year {
   weeks?: Week[];
 
   constructor() {
