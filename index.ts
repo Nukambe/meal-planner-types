@@ -43,6 +43,27 @@ export class Nutrition {
       if (nutrient.name === "Iron") this.iron = nutrient;
     });
   }
+
+  getNutrients(): Nutrient[] {
+    const nutrients: Nutrient[] = [];
+
+    if (this.calories) nutrients.push(this.calories);
+    if (this.fat) nutrients.push(this.fat);
+    if (this.saturatedFat) nutrients.push(this.saturatedFat);
+    if (this.carbohydrates) nutrients.push(this.carbohydrates);
+    if (this.fiber) nutrients.push(this.fiber);
+    if (this.sugar) nutrients.push(this.sugar);
+    if (this.protein) nutrients.push(this.protein);
+    if (this.cholesterol) nutrients.push(this.cholesterol);
+    if (this.sodium) nutrients.push(this.sodium);
+    if (this.potassium) nutrients.push(this.potassium);
+    if (this.vitaminA) nutrients.push(this.vitaminA);
+    if (this.vitaminC) nutrients.push(this.vitaminC);
+    if (this.calcium) nutrients.push(this.calcium);
+    if (this.iron) nutrients.push(this.iron);
+
+    return nutrients;
+  }
 }
 
 export class Ingredient {
