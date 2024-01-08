@@ -6,7 +6,7 @@ export type Nutrient = {
 };
 
 export class Nutrition {
-  nutrients: Nutrient[];
+  public nutrients: Nutrient[];
 
   constructor(nutrients: Nutrient[]) {
     this.nutrients = nutrients.filter(
@@ -149,15 +149,15 @@ export class Day {
 }
 
 export class Week {
-  sunday: Day;
-  monday: Day;
-  tuesday: Day;
-  wednesday: Day;
-  thursday: Day;
-  friday: Day;
-  saturday: Day;
-  macroMin: Nutrition;
-  macroMax: Nutrition;
+  public sunday: Day;
+  public monday: Day;
+  public tuesday: Day;
+  public wednesday: Day;
+  public thursday: Day;
+  public friday: Day;
+  public saturday: Day;
+  public macroMin: Nutrition;
+  public macroMax: Nutrition;
 
   constructor() {
     this.sunday = new Day();
@@ -258,7 +258,7 @@ export class Week {
 }
 
 export class Year {
-  weeks: { [key: string]: Week };
+  public weeks: { [key: string]: Week };
 
   constructor() {
     this.weeks = {};
@@ -266,14 +266,15 @@ export class Year {
 
   getWeek(week: string): Week {
     if (!(week in this.weeks)) {
-      this.weeks[week] = new Week();
+      const newWeeks = { ...this.weeks, [week]: new Week() };
+      this.weeks = newWeeks;
     }
     return this.weeks[week];
   }
 }
 
 export class MealPlan {
-  plan: { [key: string]: Year };
+  public plan: { [key: string]: Year };
 
   constructor() {
     this.plan = {};
@@ -281,7 +282,8 @@ export class MealPlan {
 
   getYear(year: string): Year {
     if (!(year in this.plan)) {
-      this.plan[year] = new Year();
+      const newPlan = { ...this.plan, [year]: new Year() };
+      this.plan = newPlan;
     }
     return this.plan[year];
   }
