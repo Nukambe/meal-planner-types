@@ -27,6 +27,15 @@ export class Nutrition {
         nutrient.name === "Iron"
     );
   }
+
+  addMacro(nutrient: Nutrient): void {
+    const macro = this.nutrients.find((macro) => macro.name === nutrient.name);
+    if (macro) {
+      macro.amount += nutrient.amount;
+    } else {
+      this.nutrients.push(nutrient);
+    }
+  }
 }
 
 export class Ingredient {
@@ -110,6 +119,33 @@ export class Day {
   removeAllMeals(): void {
     this.meals = [];
   }
+
+  getDailyMacros(): Nutrition {
+    const macros = new Nutrition([]);
+    this.meals.forEach((meal) => {
+      meal.nutrition.nutrients.forEach((nutrient) => {
+        macros.addMacro(nutrient);
+      });
+    });
+    return macros;
+  }
+
+  getDailyIngredientList(): Ingredient[] {
+    const ingredients: Ingredient[] = [];
+    this.meals.forEach((meal) => {
+      meal.recipe.ingredients.forEach((ingredient) => {
+        const existingIngredient = ingredients.find(
+          (i) => i.id === ingredient.id
+        );
+        if (existingIngredient) {
+          existingIngredient.amount += ingredient.amount;
+        } else {
+          ingredients.push(ingredient);
+        }
+      });
+    });
+    return ingredients;
+  }
 }
 
 export class Week {
@@ -191,6 +227,33 @@ export class Week {
 
   getMacros(): { min: Nutrition; max: Nutrition } {
     return { min: this.macroMin, max: this.macroMax };
+  }
+
+  getWeeklyMacros(): Nutrition {
+    const macros = new Nutrition([]);
+    this.getDays().forEach((day) => {
+      day.getDailyMacros().nutrients.forEach((nutrient) => {
+        macros.addMacro(nutrient);
+      });
+    });
+    return macros;
+  }
+
+  getWeeklyIngredientList(): Ingredient[] {
+    const ingredients: Ingredient[] = [];
+    this.getDays().forEach((day) => {
+      day.getDailyIngredientList().forEach((ingredient) => {
+        const existingIngredient = ingredients.find(
+          (i) => i.id === ingredient.id
+        );
+        if (existingIngredient) {
+          existingIngredient.amount += ingredient.amount;
+        } else {
+          ingredients.push(ingredient);
+        }
+      });
+    });
+    return ingredients;
   }
 }
 
