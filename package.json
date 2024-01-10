@@ -1,11 +1,11 @@
 {
   "name": "meal-planner-types",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "Types for Meal Planner app",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
     "build": "tsc"
   },
   "repository": {
@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/Nukambe/meal-planner-types/issues"
   },
-  "homepage": "https://github.com/Nukambe/meal-planner-types#readme"
+  "homepage": "https://github.com/Nukambe/meal-planner-types#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1"
+  }
 }
