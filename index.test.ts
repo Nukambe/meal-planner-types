@@ -40,7 +40,7 @@ describe("MealPlanner", () => {
   });
 
   it("should have 7 meals", () => {
-    expect(mealPlan.getPlannedMeals().length).toEqual(7);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(7);
   });
 
   it("should have 2 meals on Monday", () => {
@@ -56,7 +56,7 @@ describe("MealPlanner", () => {
 
   it("should remove a meal", () => {
     mealPlan.removePlannedMeal("1/7/24", MealPlanner.dayOfWeek.Monday, 0);
-    expect(mealPlan.getPlannedMeals().length).toEqual(6);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(6);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
@@ -69,7 +69,7 @@ describe("MealPlanner", () => {
       day: MealPlanner.dayOfWeek.Monday,
       id: 7,
     });
-    expect(mealPlan.getPlannedMeals().length).toEqual(8);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(8);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
@@ -82,7 +82,7 @@ describe("MealPlanner", () => {
       day: MealPlanner.dayOfWeek.Monday,
       id: 7,
     });
-    expect(mealPlan.getPlannedMeals().length).toEqual(8);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(8);
     expect(
       mealPlan.getPlannedMealsByDay("1/21/24", MealPlanner.dayOfWeek.Monday)
         .length
@@ -96,7 +96,7 @@ describe("MealPlanner", () => {
       MealPlanner.dayOfWeek.Monday,
       template
     );
-    expect(mealPlan.getPlannedMeals().length).toEqual(15);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(15);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
@@ -146,11 +146,19 @@ describe("MealPlanner", () => {
 
     mealPlan.applyWeeklyTemplate(template);
 
-    expect(mealPlan.getPlannedMeals().length).toEqual(23);
+    expect(mealPlan.getAllPlannedMeals().length).toEqual(23);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
     ).toEqual(3);
     expect(mealPlan.getPlannedMealsByWeek("1/7/24").length).toEqual(21);
+  });
+
+  it("should return an empty array when getting meals from a week that doesn't exist", () => {
+    expect(mealPlan.getPlannedMealsByWeek("1/21/24").length).toEqual(0);
+  });
+
+  it("should return an empty array when getting meals from a day that doesn't exist", () => {
+    expect(mealPlan.getPlannedMealsByDay("1/21/24", 0).length).toEqual(0);
   });
 });

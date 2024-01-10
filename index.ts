@@ -363,11 +363,13 @@ export class MealPlan {
     }, [] as plannedMeal[]);
   }
 
-  getPlannedMeals(): plannedMeal[] {
+  getAllPlannedMeals(): plannedMeal[] {
     return this.plannedMeals;
   }
 
   getPlannedMealsByWeek(week: string) {
+    if (!(week in this.hashTable)) return [];
+
     const meals: number[] = [];
     Object.values(this.hashTable[week]).forEach((mls) => {
       mls.forEach(({ id }) => meals.push(id));
@@ -376,6 +378,8 @@ export class MealPlan {
   }
 
   getPlannedMealsByDay(week: string, day: dayOfWeek) {
+    if (!(week in this.hashTable)) return [];
+
     return this.hashTable[week][day].map(({ id }) => id);
   }
 
