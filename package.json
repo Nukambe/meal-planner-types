@@ -1,6 +1,6 @@
 {
   "name": "meal-planner-types",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Types for Meal Planner app",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

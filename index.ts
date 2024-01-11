@@ -36,7 +36,7 @@ export class MealPlan {
     }
   }
 
-  constructFromArray(): hashTable {
+  private constructFromArray(): hashTable {
     return this.plannedMeals.reduce((acc, meal, index) => {
       if (meal.week in acc) {
         acc[meal.week][meal.day].push({ id: meal.id, index });
@@ -56,11 +56,12 @@ export class MealPlan {
     }, {} as hashTable);
   }
 
-  constructFromHash(): plannedMeal[] {
+  private constructFromHash(): plannedMeal[] {
     return Object.entries(this.hashTable).reduce((acc, [week, days]) => {
       Object.entries(days).forEach(([day, ids]) => {
-        ids.forEach(({ id }) => {
-          acc.push({ week, day: parseInt(day), id });
+        ids.forEach((meal) => {
+          meal.index = acc.length;
+          acc.push({ week, day: parseInt(day), id: meal.id });
         });
       });
       return acc;
@@ -111,7 +112,7 @@ export class MealPlan {
   }
 
   removePlannedMeal(week: string, day: dayOfWeek, index: number) {
-    const meal = this.hashTable[week][day].find((_, idx) => idx === index);
+    const meal = this.hashTable[week][day][index];
     if (!meal) return;
     this.hashTable[week][day].splice(index, 1);
     this.plannedMeals = this.constructFromHash();
