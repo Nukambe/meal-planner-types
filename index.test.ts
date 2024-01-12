@@ -24,15 +24,10 @@ describe("MealPlanner", () => {
       id: 6,
     };
 
-    mealPlan = new MealPlanner.MealPlan([
-      meal1,
-      meal2,
-      meal3,
-      meal4,
-      meal5,
-      meal6,
-      meal7,
-    ]);
+    mealPlan = new MealPlanner.MealPlan(
+      [meal1, meal2, meal3, meal4, meal5, meal6, meal7],
+      []
+    );
   });
 
   it("should export MealPlanner", () => {
@@ -56,6 +51,7 @@ describe("MealPlanner", () => {
 
   it("should remove a meal", () => {
     mealPlan.removePlannedMeal("1/7/24", MealPlanner.dayOfWeek.Monday, 0);
+    mealPlan.removePlannedMeal("1/7/24", MealPlanner.dayOfWeek.Monday, 10);
     expect(mealPlan.getAllPlannedMeals().length).toEqual(6);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
@@ -74,6 +70,21 @@ describe("MealPlanner", () => {
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
     ).toEqual(3);
+  });
+
+  it("should add a duplicate meal and keep an accurate count", () => {
+    for (let i = 0; i < 5; i++) {
+      mealPlan.addPlannedMeal({
+        week: "1/21/24",
+        day: MealPlanner.dayOfWeek.Monday,
+        id: 0,
+      });
+    }
+    const ids = mealPlan.getPlannedMealsByDay(
+      "1/21/24",
+      MealPlanner.dayOfWeek.Monday
+    );
+    expect(ids.length).toEqual(5);
   });
 
   it("should create a new week", () => {
@@ -104,54 +115,75 @@ describe("MealPlanner", () => {
   });
 
   it("should apply a template to a week", () => {
-    const template = {
-      "1/7/24": {
-        0: [
-          { id: 100, index: 0 },
-          { id: 101, index: 1 },
-          { id: 102, index: 2 },
-        ],
-        1: [
-          { id: 101, index: 1 },
-          { id: 102, index: 2 },
-          { id: 103, index: 3 },
-        ],
-        2: [
-          { id: 102, index: 2 },
-          { id: 103, index: 3 },
-          { id: 104, index: 4 },
-        ],
-        3: [
-          { id: 103, index: 3 },
-          { id: 104, index: 4 },
-          { id: 105, index: 5 },
-        ],
-        4: [
-          { id: 104, index: 4 },
-          { id: 105, index: 5 },
-          { id: 106, index: 6 },
-        ],
-        5: [
-          { id: 105, index: 5 },
-          { id: 106, index: 6 },
-          { id: 100, index: 0 },
-        ],
-        6: [
-          { id: 106, index: 6 },
-          { id: 100, index: 0 },
-          { id: 101, index: 1 },
-        ],
+    const template: {
+      meals: MealPlanner.plannedMeals;
+      goals: MealPlanner.plannedGoals;
+    } = {
+      meals: {
+        "0/0/00": {
+          0: [0, 1, 2],
+          1: [3, 4, 5],
+          2: [6, 7, 8],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+        },
+      },
+      goals: {
+        "0/0/00": {
+          0: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          1: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          2: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          3: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          4: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          5: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          6: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+        },
       },
     };
 
-    mealPlan.applyWeeklyTemplate(template);
-
-    expect(mealPlan.getAllPlannedMeals().length).toEqual(23);
+    mealPlan.applyWeeklyTemplate("1/7/24", template);
     expect(
       mealPlan.getPlannedMealsByDay("1/7/24", MealPlanner.dayOfWeek.Monday)
         .length
     ).toEqual(3);
-    expect(mealPlan.getPlannedMealsByWeek("1/7/24").length).toEqual(21);
+    expect(mealPlan.getPlannedMealsByWeek("1/7/24").length).toEqual(9);
   });
 
   it("should return an empty array when getting meals from a week that doesn't exist", () => {

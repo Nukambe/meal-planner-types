@@ -18,28 +18,43 @@ export interface plannedMeal {
   id: number;
 }
 
-export interface hashTable {
-  [key: string]: { [key in dayOfWeek]: { id: number; index: number }[] };
+export interface plannedGoal {
+  week: string; // "m/d/yy"
+  day: dayOfWeek;
+  calories: { min: number; max: number };
+  carbs: { min: number; max: number };
+  fat: { min: number; max: number };
+  protein: { min: number; max: number };
+}
+
+export interface plannedMeals {
+  [key: string]: { [key in dayOfWeek]: number[] };
+}
+
+export interface plannedGoals {
+  [key: string]: {
+    [key in dayOfWeek]: {
+      calories: { min: number; max: number };
+      carbs: { min: number; max: number };
+      fat: { min: number; max: number };
+      protein: { min: number; max: number };
+    };
+  };
 }
 
 export class MealPlan {
-  private plannedMeals: plannedMeal[];
-  private hashTable: hashTable;
+  private plannedMeals: plannedMeals;
+  private plannedGoals: plannedGoals;
 
-  constructor(meals: plannedMeal[] | hashTable) {
-    if (Array.isArray(meals)) {
-      this.plannedMeals = meals;
-      this.hashTable = this.constructFromArray();
-    } else {
-      this.hashTable = meals;
-      this.plannedMeals = this.constructFromHash();
-    }
+  constructor(meals: plannedMeal[], goals: plannedGoal[]) {
+    this.plannedMeals = this.constructFromArray(meals);
+    this.plannedGoals = this.constructGoalsFromArray(goals);
   }
 
-  private constructFromArray(): hashTable {
-    return this.plannedMeals.reduce((acc, meal, index) => {
+  private constructFromArray(meals: plannedMeal[]): plannedMeals {
+    return meals.reduce((acc, meal) => {
       if (meal.week in acc) {
-        acc[meal.week][meal.day].push({ id: meal.id, index });
+        acc[meal.week][meal.day].push(meal.id);
       } else {
         acc[meal.week] = {
           [dayOfWeek.Sunday]: [],
@@ -50,53 +65,121 @@ export class MealPlan {
           [dayOfWeek.Friday]: [],
           [dayOfWeek.Saturday]: [],
         };
-        acc[meal.week][meal.day] = [{ id: meal.id, index }];
+        acc[meal.week][meal.day] = [meal.id];
       }
       return acc;
-    }, {} as hashTable);
+    }, {} as plannedMeals);
   }
 
-  private constructFromHash(): plannedMeal[] {
-    return Object.entries(this.hashTable).reduce((acc, [week, days]) => {
-      Object.entries(days).forEach(([day, ids]) => {
-        ids.forEach((meal) => {
-          meal.index = acc.length;
-          acc.push({ week, day: parseInt(day), id: meal.id });
-        });
-      });
+  private constructGoalsFromArray(goals: plannedGoal[]): plannedGoals {
+    return goals.reduce((acc, goal) => {
+      if (!(goal.week in acc)) {
+        acc[goal.week] = {
+          [dayOfWeek.Sunday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Monday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Tuesday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Wednesday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Thursday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Friday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+          [dayOfWeek.Saturday]: {
+            calories: { min: 0, max: 0 },
+            carbs: { min: 0, max: 0 },
+            fat: { min: 0, max: 0 },
+            protein: { min: 0, max: 0 },
+          },
+        };
+      }
+      acc[goal.week][goal.day] = {
+        calories: goal.calories,
+        carbs: goal.carbs,
+        fat: goal.fat,
+        protein: goal.protein,
+      };
       return acc;
-    }, [] as plannedMeal[]);
+    }, {} as plannedGoals);
   }
 
-  getAllPlannedMeals(): plannedMeal[] {
+  getPlannedMeals(): plannedMeals {
     return this.plannedMeals;
   }
 
+  getPlannedGoals(): plannedGoals {
+    return this.plannedGoals;
+  }
+
+  getAllPlannedMeals(): plannedMeal[] {
+    const meals: plannedMeal[] = [];
+    Object.entries(this.plannedMeals).forEach(([week, days]) => {
+      Object.entries(days).forEach(([day, mealIds]) => {
+        mealIds.forEach((id) => {
+          meals.push({ week, day: parseInt(day), id });
+        });
+      });
+    });
+    return meals;
+  }
+
+  getAllPlannedGoals(): plannedGoal[] {
+    const goals: plannedGoal[] = [];
+    Object.entries(this.plannedGoals).forEach(([week, days]) => {
+      Object.entries(days).forEach(([day, goal]) => {
+        goals.push({ week, day: parseInt(day), ...goal });
+      });
+    });
+    return goals;
+  }
+
   getPlannedMealsByWeek(week: string) {
-    if (!(week in this.hashTable)) return [];
+    if (!(week in this.plannedMeals)) return [];
 
     const meals: number[] = [];
-    Object.values(this.hashTable[week]).forEach((mls) => {
-      mls.forEach(({ id }) => meals.push(id));
+    Object.values(this.plannedMeals[week]).forEach((mealIds) => {
+      mealIds.forEach((id) => meals.push(id));
     });
     return meals;
   }
 
   getPlannedMealsByDay(week: string, day: dayOfWeek) {
-    if (!(week in this.hashTable)) return [];
+    if (!(week in this.plannedMeals)) return [];
 
-    return this.hashTable[week][day].map(({ id }) => id);
+    return this.plannedMeals[week][day].map((mealId) => mealId);
   }
 
   addPlannedMeal(meal: plannedMeal): void {
-    this.plannedMeals.push(meal);
-    if (meal.week in this.hashTable) {
-      this.hashTable[meal.week][meal.day].push({
-        id: meal.id,
-        index: this.plannedMeals.length - 1,
-      });
+    if (meal.week in this.plannedMeals) {
+      this.plannedMeals[meal.week][meal.day].push(meal.id);
     } else {
-      this.hashTable[meal.week] = {
+      this.plannedMeals[meal.week] = {
         [dayOfWeek.Sunday]: [],
         [dayOfWeek.Monday]: [],
         [dayOfWeek.Tuesday]: [],
@@ -105,18 +188,104 @@ export class MealPlan {
         [dayOfWeek.Friday]: [],
         [dayOfWeek.Saturday]: [],
       };
-      this.hashTable[meal.week][meal.day] = [
-        { id: meal.id, index: this.plannedMeals.length - 1 },
-      ];
+      this.plannedMeals[meal.week][meal.day] = [meal.id];
     }
   }
 
   removePlannedMeal(week: string, day: dayOfWeek, index: number) {
-    const meal = this.hashTable[week][day][index];
-    if (!meal) return;
-    this.hashTable[week][day].splice(index, 1);
-    this.plannedMeals = this.constructFromHash();
+    const meal = this.plannedMeals[week][day][index];
+    if (meal === null) return;
+    this.plannedMeals[week][day].splice(index, 1);
     return meal;
+  }
+
+  getPlannedGoalsByWeek(week: string): plannedGoal[] {
+    if (!(week in this.plannedGoals)) return [];
+
+    const goals: plannedGoal[] = [];
+    Object.entries(this.plannedGoals[week]).forEach(([day, goal]) => {
+      goals.push({ week, day: parseInt(day), ...goal });
+    });
+    return goals;
+  }
+
+  getPlannedGoalsByDay(week: string, day: dayOfWeek): plannedGoal {
+    if (!(week in this.plannedGoals))
+      return {
+        week,
+        day,
+        calories: { min: 0, max: 0 },
+        carbs: { min: 0, max: 0 },
+        fat: { min: 0, max: 0 },
+        protein: { min: 0, max: 0 },
+      };
+
+    return { week, day, ...this.plannedGoals[week][day] };
+  }
+
+  addPlannedGoal(goal: plannedGoal): void {
+    if (!(goal.week in this.plannedGoals)) {
+      this.plannedGoals[goal.week] = {
+        [dayOfWeek.Sunday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Monday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Tuesday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Wednesday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Thursday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Friday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+        [dayOfWeek.Saturday]: {
+          calories: { min: 0, max: 0 },
+          carbs: { min: 0, max: 0 },
+          fat: { min: 0, max: 0 },
+          protein: { min: 0, max: 0 },
+        },
+      };
+    }
+    this.plannedGoals[goal.week][goal.day] = {
+      calories: goal.calories,
+      carbs: goal.carbs,
+      fat: goal.fat,
+      protein: goal.protein,
+    };
+  }
+
+  removePlannedGoal(week: string, day: dayOfWeek) {
+    if (!(week in this.plannedGoals)) return;
+    this.plannedGoals[week][day] = {
+      calories: { min: 0, max: 0 },
+      carbs: { min: 0, max: 0 },
+      fat: { min: 0, max: 0 },
+      protein: { min: 0, max: 0 },
+    };
   }
 
   reorderPlannedMeal(
@@ -125,53 +294,66 @@ export class MealPlan {
     oldIndex: number,
     newIndex: number
   ) {
-    const meal = this.hashTable[week][day].find((_, idx) => idx === oldIndex);
+    const meal = this.plannedMeals[week][day].find(
+      (_, idx) => idx === oldIndex
+    );
     if (!meal) return;
-    this.hashTable[week][day].splice(oldIndex, 1);
-    this.hashTable[week][day].splice(newIndex, 0, meal);
+    this.plannedMeals[week][day].splice(oldIndex, 1);
+    this.plannedMeals[week][day].splice(newIndex, 0, meal);
   }
 
-  applyWeeklyTemplate(template: hashTable) {
-    const week = Object.keys(template)[0];
+  applyWeeklyTemplate(
+    week: string,
+    template: { meals: plannedMeals; goals: plannedGoals }
+  ) {
     this.clearWeek(week);
-    this.plannedMeals = this.constructFromHash();
-
-    Object.entries(template[week]).forEach(([day, meals]) => {
-      meals.forEach(({ id }) => {
-        this.addPlannedMeal({ week, day: parseInt(day), id });
+    // add meals
+    Object.entries(template.meals["0/0/00"]).forEach(([day, meals]) => {
+      meals.forEach((mealId) => {
+        this.addPlannedMeal({ week, day: parseInt(day), id: mealId });
       });
     });
+    // add goals
+    // ...
   }
 
   applyDailyTemplate(week: string, day: dayOfWeek, template: number[]) {
     this.clearDay(week, day);
-    this.plannedMeals = this.constructFromHash();
-    template.forEach((id) => {
-      this.addPlannedMeal({ week, day, id });
+    template.forEach((mealId) => {
+      this.addPlannedMeal({ week, day, id: mealId });
     });
   }
 
   clearWeek(week: string) {
-    this.hashTable[week] = {
-      [dayOfWeek.Sunday]: [],
-      [dayOfWeek.Monday]: [],
-      [dayOfWeek.Tuesday]: [],
-      [dayOfWeek.Wednesday]: [],
-      [dayOfWeek.Thursday]: [],
-      [dayOfWeek.Friday]: [],
-      [dayOfWeek.Saturday]: [],
-    };
-    this.plannedMeals = this.constructFromHash();
+    delete this.plannedMeals[week];
+  }
+
+  clearWeekGoals(week: string) {
+    delete this.plannedGoals[week];
   }
 
   clearDay(week: string, day: dayOfWeek) {
-    this.hashTable[week][day] = [];
-    this.plannedMeals = this.constructFromHash();
+    this.plannedMeals[week][day] = [];
   }
 
+  clearDayGoals(week: string, day: dayOfWeek) {
+    this.plannedGoals[week][day] = {
+      calories: { min: 0, max: 0 },
+      carbs: { min: 0, max: 0 },
+      fat: { min: 0, max: 0 },
+      protein: { min: 0, max: 0 },
+    };
+  }
+
+  clearMeals() {
+    this.plannedMeals = {};
+  }
+  clearGoals() {
+    this.plannedGoals = {};
+  }
   clearPlan() {
-    this.hashTable = {};
-    this.plannedMeals = [];
+    this.clearMeals();
+    this.clearGoals();
   }
 }
 //------------------------------------------------------------------------------
