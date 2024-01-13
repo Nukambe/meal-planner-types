@@ -379,3 +379,11 @@ export interface Meal {
   diets: string[];
   instructions: { number: number; step: string }[];
 }
+//------------------------------------------------------------------------------
+// Meal Template
+//------------------------------------------------------------------------------
+export interface MealTemplate {
+  title: string;
+  meals: { [key in dayOfWeek]: number[] };
+  goals: { [key in dayOfWeek]: plannedGoal };
+}
