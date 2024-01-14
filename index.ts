@@ -314,7 +314,9 @@ export class MealPlan {
       });
     });
     // add goals
-    // ...
+    Object.entries(template.goals["0/0/00"]).forEach(([day, goal]) => {
+      this.addPlannedGoal({ week, day: parseInt(day), ...goal });
+    });
   }
 
   applyDailyTemplate(week: string, day: dayOfWeek, template: number[]) {
