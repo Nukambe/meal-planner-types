@@ -315,7 +315,6 @@ export class MealPlan {
     });
     // add goals
     Object.entries(template.goals["0/0/00"]).forEach(([day, goal]) => {
-      console.log("day", day, "goal", goal);
       this.addPlannedGoal({
         week,
         day: parseInt(day),
