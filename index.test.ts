@@ -133,10 +133,10 @@ describe("MealPlanner", () => {
       goals: {
         "0/0/00": {
           0: {
-            calories: { min: 0, max: 0 },
-            carbs: { min: 0, max: 0 },
-            fat: { min: 0, max: 0 },
-            protein: { min: 0, max: 0 },
+            calories: { min: 100, max: 0 },
+            carbs: { min: 100, max: 0 },
+            fat: { min: 100, max: 0 },
+            protein: { min: 500, max: 0 },
           },
           1: {
             calories: { min: 0, max: 0 },
@@ -184,6 +184,10 @@ describe("MealPlanner", () => {
         .length
     ).toEqual(3);
     expect(mealPlan.getPlannedMealsByWeek("1/7/24").length).toEqual(9);
+    expect(
+      mealPlan.getPlannedGoalsByDay("1/7/24", MealPlanner.dayOfWeek.Sunday)
+        .protein.min
+    ).toEqual(500);
   });
 
   it("should return an empty array when getting meals from a week that doesn't exist", () => {

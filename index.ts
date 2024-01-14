@@ -315,7 +315,15 @@ export class MealPlan {
     });
     // add goals
     Object.entries(template.goals["0/0/00"]).forEach(([day, goal]) => {
-      this.addPlannedGoal({ week, day: parseInt(day), ...goal });
+      console.log("day", day, "goal", goal);
+      this.addPlannedGoal({
+        week,
+        day: parseInt(day),
+        calories: goal.calories,
+        carbs: goal.carbs,
+        fat: goal.fat,
+        protein: goal.protein,
+      });
     });
   }
 
